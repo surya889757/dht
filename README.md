@@ -59,10 +59,6 @@ char pass[] = "union9999";  //Enter your WIFI Password
 DHT dht(DHTPIN, DHTTYPE);
 SimpleTimer timer;
 
-// This function sends Arduino's up time every second to Virtual Pin (5).
-// In the app, Widget's reading frequency should be set to PUSH. This means
-// that you define how often to send data to Blynk App.
-void sendSensor()
 {
   float h = dht.readHumidity();
   float t = dht.readTemperature(); // or dht.readTemperature(true) for Fahrenheit
@@ -95,4 +91,4 @@ void loop()
 }
 
 
-UuFHDmHP1RyyeXEIv_UtRPrLrB-GyraF
+
