@@ -1,127 +1,100 @@
+https://api.thingspeak.com/channels/1150335/feeds.json?api_key=7DDN0LXFDCBWMCT1&results
+
+code-2   https://drive.google.com/open?id=1nve_z24ZYbeCWOxKprVrdM8lTn5v3pDJ
+//http://youtube.com/c/imtiaztech
+//weather station
+/**************************************************************
+ * Blynk is a platform with iOS and Android apps to control
+ * Arduino, Raspberry Pi and the likes over the Internet.
+ * You can easily build graphic interfaces for all your
+ * projects by simply dragging and dropping widgets.
+ *
+ *   Downloads, docs, tutorials: http://www.blynk.cc
+ *   Blynk community:            http://community.blynk.cc
+ *   Social networks:            http://www.fb.com/blynkapp
+ *                               http://twitter.com/blynk_app
+ *
+ * Blynk library is licensed under MIT license
+ * This example code is in public domain.
+ *
+ **************************************************************
+ * This example shows how value can be pushed from Arduino to
+ * the Blynk App.
+ *
+ * WARNING :
+ * For this example you'll need SimpleTimer library:
+ *   https://github.com/jfturcot/SimpleTimer
+ * and Adafruit DHT sensor library:
+ *   https://github.com/adafruit/DHT-sensor-library
+ *
+ * App project setup:
+ *   Value Display widget attached to V5
+ *   Value Display widget attached to V6
+ *
+ **************************************************************/
+
+#define BLYNK_PRINT Serial    // Comment this out to disable prints and save space
+#include <SPI.h>
 #include <ESP8266WiFi.h>
-#include "Adafruit_MQTT.h"
-#include "Adafruit_MQTT_Client.h"
+#include <BlynkSimpleEsp8266.h>
+#include <SimpleTimer.h>
+#include <DHT.h>
 
-#define WIFI_SSID "E for Engineer"//Your wifi name
-#define WIFI_PASS "EforEngineer"//your wifi password
+// You should get Auth Token in the Blynk App.
+// Go to the Project Settings (nut icon).
+char auth[] = "3Y20Ilp4n1gOFzW1fTAKt-kXpTUe2fKY"; //Enter the Auth code which was send by Blink
 
-#define MQTT_SERV "io.adafruit.com"
-#define MQTT_PORT 1883
-#define MQTT_NAME "E_for_Engineer" //Your adafruit name
-#define MQTT_PASS "633551f4e1204412825a0e3b97b99fde" //Your adafruit AIO key
+// Your WiFi credentials.
+// Set password to "" for open networks.
+char ssid[] = "Imtiaz";  //Enter your WIFI Name
+char pass[] = "union9999";  //Enter your WIFI Password
 
-int led = D7;
+#define DHTPIN 2          // Digital pin 4
 
-WiFiClient client;
-Adafruit_MQTT_Client mqtt(&client, MQTT_SERV, MQTT_PORT, MQTT_NAME, MQTT_PASS);
+// Uncomment whatever type you're using!
+#define DHTTYPE DHT11     // DHT 11
+//#define DHTTYPE DHT22   // DHT 22, AM2302, AM2321
+//#define DHTTYPE DHT21   // DHT 21, AM2301
 
-Adafruit_MQTT_Subscribe Lights = Adafruit_MQTT_Subscribe(&mqtt, MQTT_NAME "/f/Lights");
-Adafruit_MQTT_Publish LightsStatus = Adafruit_MQTT_Publish(&mqtt, MQTT_NAME "/f/LightsStatus");
+DHT dht(DHTPIN, DHTTYPE);
+SimpleTimer timer;
 
+// This function sends Arduino's up time every second to Virtual Pin (5).
+// In the app, Widget's reading frequency should be set to PUSH. This means
+// that you define how often to send data to Blynk App.
+void sendSensor()
+{
+  float h = dht.readHumidity();
+  float t = dht.readTemperature(); // or dht.readTemperature(true) for Fahrenheit
+
+  if (isnan(h) || isnan(t)) {
+    Serial.println("Failed to read from DHT sensor!");
+    return;
+  }
+  // You can send any value at any time.
+  // Please don't send more that 10 values per second.
+  Blynk.virtualWrite(V5, h);  //V5 is for Humidity
+  Blynk.virtualWrite(V6, t);  //V6 is for Temperature
+}
 
 void setup()
 {
-  Serial.begin(9600);
-  pinMode(LED_BUILTIN, OUTPUT);
+  Serial.begin(9600); // See the connection status in Serial Monitor
+  Blynk.begin(auth, ssid, pass);
 
+  dht.begin();
 
-  //Connect to WiFi
-  Serial.print("\n\nConnecting Wifi>");
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
-  digitalWrite(LED_BUILTIN, LOW);
-
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    Serial.print(">");
-    delay(50);
-  }
-
-  Serial.println("OK!");
-
-  //Subscribe to the Lights topic
-  mqtt.subscribe(&Lights);
-
-  pinMode(led, OUTPUT);
-  digitalWrite(LED_BUILTIN, HIGH);
-  digitalWrite(led, LOW);
-
+  // Setup a function to be called every second
+  timer.setInterval(1000L, sendSensor);
 }
 
 void loop()
 {
-  //Connect/Reconnect to MQTT
-  MQTT_connect();
-
-  //Read from our subscription queue until we run out, or
-  //wait up to 5 seconds for subscription to update
-  Adafruit_MQTT_Subscribe * subscription;
-  while ((subscription = mqtt.readSubscription(5000)))
-  {
-    //If we're in here, a subscription updated...
-    if (subscription == &Lights)
-    {
-      //Print the new value to the serial monitor
-      Serial.print("Lights: ");
-      Serial.println((char*) Lights.lastread);
-
-      //If the new value is  "ON", turn the light on.
-      //Otherwise, turn it off.
-      if (!strcmp((char*) Lights.lastread, "ON"))
-      {
-        //active low logic
-        digitalWrite(led, HIGH);
-        LightsStatus.publish("ON");
-      }
-      else if (!strcmp((char*) Lights.lastread, "OFF"))
-      {
-        digitalWrite(led, LOW);
-        LightsStatus.publish("OFF");
-
-      }
-      else
-      {
-        LightsStatus.publish("ERROR");
-      }
-    }
-    else
-    {
-      //LightsStatus.publish("ERROR");
-    }
-  }
-  //  if (!mqtt.ping())
-  //  {
-  //    mqtt.disconnect();
-  //  }
+  Blynk.run(); // Initiates Blynk
+  timer.run(); // Initiates SimpleTimer
 }
 
 
-void MQTT_connect()
-{
+UuFHDmHP1RyyeXEIv_UtRPrLrB-GyraF
 
-  //  // Stop if already connected
-  if (mqtt.connected() && mqtt.ping())
-  {
-    //    mqtt.disconnect();
-    return;
-  }
-
-  int8_t ret;
-
-  mqtt.disconnect();
-
-  Serial.print("Connecting to MQTT... ");
-  uint8_t retries = 3;
-  while ((ret = mqtt.connect()) != 0) // connect will return 0 for connected
-  {
-    Serial.println(mqtt.connectErrorString(ret));
-    Serial.println("Retrying MQTT connection in 5 seconds...");
-    mqtt.disconnect();
-    delay(5000);  // wait 5 seconds
-    retries--;
-    if (retries == 0)
-    {
-      ESP.reset();
-    }
-  }
-  Serial.println("MQTT Connected!");
-}
+https://youtu.be/hSf7wVID2nU
