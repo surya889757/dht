@@ -1,7 +1,3 @@
-adafruit
-id:s8897576332
-key:aio_gQgl52eY48FDb2Ol4f31eNHm2mPq
-
 #include <ESP8266WiFi.h>
 #include "Adafruit_MQTT.h"
 #include "Adafruit_MQTT_Client.h"
