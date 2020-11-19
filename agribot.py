@@ -260,3 +260,14 @@ except KeyboardInterrupt:
 
 # Reset GPIO settings
 GPIO.cleanup()
+
+
+
+URL :  http://embagribot.dbandroid.online/
+
+Credentials : 
+
+email        : admin@gmail.com
+password : agri@123
+
+API : http://embagribot.dbandroid.online/save_values.php?tmp=&humidity=&soil=&id=
